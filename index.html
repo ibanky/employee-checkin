@@ -13,7 +13,6 @@
         body {
             font-family: 'Sarabun', sans-serif;
         }
-        /* Simple loader animation */
         .loader {
             border: 4px solid #f3f3f3;
             border-radius: 50%;
@@ -28,10 +27,19 @@
         }
     </style>
 </head>
-<body class="bg-gray-100 flex items-center justify-center min-h-screen">
+<body class="bg-gray-100 flex items-center justify-center min-h-screen p-4">
 
     <div class="w-full max-w-md mx-auto bg-white rounded-xl shadow-lg p-8 space-y-6">
         
+        <!-- === IMAGE ADDED HERE === -->
+        <!-- 
+          สำคัญ: แก้ไข URL ตรง src นี้ให้เป็น URL รูปภาพของคุณที่ได้จาก GitHub
+        -->
+        <img src="https://ibanky.github.io/employee-checkin/event-poster.jpeg" 
+             alt="Event Poster" 
+             class="w-full max-w-xs mx-auto mb-6 rounded-lg shadow-md">
+        <!-- === END OF IMAGE SECTION === -->
+
         <div class="text-center">
             <h1 class="text-3xl font-bold text-gray-800">ระบบลงทะเบียน</h1>
             <p class="text-gray-500 mt-2">กรุณากรอกรหัสพนักงานเพื่อรับเบอร์ห้อง</p>
@@ -56,58 +64,42 @@
     </div>
 
     <script>
-        // !!! URL นี้ต้องเป็น URL ล่าสุดที่คุณได้จากการ Deploy นะครับ !!!
         const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyHGALqaoPvKzkc0BCtXWshMYJE1dFCIy6Au22W0-mDvbJEBOTknW-Vdoj-Bs6F3g9S/exec';
-
         const form = document.getElementById('checkinForm');
         const submitButton = document.getElementById('submitButton');
         const buttonText = document.getElementById('buttonText');
         const loader = document.getElementById('loader');
         const resultDiv = document.getElementById('result');
         const employeeIdInput = document.getElementById('employeeId');
-        
         let currentEmployeeId = '';
-
         form.addEventListener('submit', (e) => {
             e.preventDefault();
-
             submitButton.disabled = true;
             buttonText.textContent = 'กำลังตรวจสอบ...';
             loader.classList.remove('hidden');
             resultDiv.classList.add('hidden');
-
             const employeeIdValue = employeeIdInput.value;
             currentEmployeeId = employeeIdValue;
-
             const oldScript = document.getElementById('jsonp-script');
             if (oldScript) {
                 oldScript.remove();
             }
-
             const script = document.createElement('script');
             script.id = 'jsonp-script';
             script.src = `${SCRIPT_URL}?callback=handleGASResponse&employeeId=${encodeURIComponent(employeeIdValue)}`;
-
             script.onerror = () => {
                 handleGASResponse({ status: 'error', message: 'ไม่สามารถเชื่อมต่อกับเซิร์ฟเวอร์ได้' });
             };
-
             document.body.appendChild(script);
         });
-
         function handleGASResponse(data) {
             resultDiv.classList.remove('hidden', 'bg-green-100', 'text-green-800', 'bg-red-100', 'text-red-800', 'bg-yellow-100', 'text-yellow-800', 'bg-blue-100', 'text-blue-800');
-
-            // --- CODE EDITED HERE ---
-            // เพิ่มการแสดงผล "ข้อมูลกลุ่ม" ที่ได้รับมาจาก data.group
             if (data.status === 'success') {
                 resultDiv.classList.add('bg-green-100', 'text-green-800');
                 resultDiv.innerHTML = `ยินดีต้อนรับ!<br>รหัสพนักงาน: <span class="font-bold">${currentEmployeeId}</span><br>กลุ่ม: <span class="font-bold">${data.group}</span><br>เบอร์ห้องของคุณคือ: <span class="font-bold text-2xl">${data.room}</span>`;
-            
             } else if (data.status === 'already_checked_in') {
-                resultDiv.classList.add('bg-red-100', 'text-white-800');
+                resultDiv.classList.add('bg-blue-100', 'text-blue-800');
                 resultDiv.innerHTML = `<span class="font-bold">ท่านได้ดำเนินการ check in มาแล้ว</span><br>รหัสพนักงาน: <span class="font-bold">${currentEmployeeId}</span><br>กลุ่ม: <span class="font-bold">${data.group}</span><br>เบอร์ห้องของคุณคือ: <span class="font-bold text-2xl">${data.room}</span>`;
-            
             } else if (data.status === 'not_found') {
                 resultDiv.classList.add('bg-yellow-100', 'text-yellow-800');
                 resultDiv.textContent = 'ไม่พบเบอร์ห้องสำหรับรหัสพนักงานนี้';
@@ -115,13 +107,10 @@
                 resultDiv.classList.add('bg-red-100', 'text-red-800');
                 resultDiv.textContent = data.message || 'เกิดข้อผิดพลาดที่ไม่ทราบสาเหตุ';
             }
-            // --- END OF EDIT ---
-
             submitButton.disabled = false;
             buttonText.textContent = 'Check-in';
             loader.classList.add('hidden');
             employeeIdInput.value = '';
-
             const scriptTag = document.getElementById('jsonp-script');
             if (scriptTag) {
                 scriptTag.remove();

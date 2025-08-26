@@ -19,7 +19,7 @@
 
     <div class="container mx-auto p-4 md:p-8">
         <header class="mb-8">
-            <h1 class="text-4xl font-bold text-gray-800"> สรุปข้อมูลการ Check-in </h1>
+            <h1 class="text-4xl font-bold text-gray-800">สรุปข้อมูลการ Check-in</h1>
             <p class="text-gray-500">ข้อมูลอัปเดตล่าสุด: <span id="lastUpdated">กำลังโหลด...</span></p>
         </header>
 
@@ -61,20 +61,16 @@
                 </div>
             </div>
 
-            <!-- === SECTION EDITED HERE === -->
             <div class="mt-8 grid grid-cols-1 md:grid-cols-2 gap-8">
                 <div class="bg-white p-6 rounded-xl shadow-lg">
-                    <!-- Title changed from 3 to 5 -->
                     <h2 class="text-2xl font-bold text-gray-700 mb-4">5 อันดับ Check-in เร็วที่สุด</h2>
                     <ol id="fastestCheckinList" class="space-y-4"></ol>
                 </div>
                 <div class="bg-white p-6 rounded-xl shadow-lg">
-                    <!-- Title changed from 3 to 5 -->
                     <h2 class="text-2xl font-bold text-gray-700 mb-4">5 อันดับ Check-in ช้าที่สุด</h2>
                     <ol id="slowestCheckinList" class="space-y-4"></ol>
                 </div>
             </div>
-            <!-- === END OF SECTION === -->
         </div>
     </div>
 
@@ -119,21 +115,31 @@
                 fastestList.innerHTML = '';
                 slowestList.innerHTML = '';
 
-                // Changed data.fastestThree to data.fastestFive
+                // Function to create ranking list item HTML
+                const createRankItemHTML = (item) => {
+                    const time = new Date(item.time).toLocaleTimeString('th-TH', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+                    return `<li class="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                                <span class="font-bold text-gray-800 text-lg">${item.id}</span>
+                                <div class="text-right">
+                                    <p class="text-sm font-medium text-gray-600">${item.department}</p>
+                                    <p class="text-xs text-gray-400">${time}</p>
+                                </div>
+                            </li>`;
+                };
+
+                // Populate fastest list
                 if (data.fastestFive && data.fastestFive.length > 0) {
                     data.fastestFive.forEach(item => {
-                        const time = new Date(item.time).toLocaleTimeString('th-TH', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
-                        fastestList.innerHTML += `<li class="flex items-center justify-between p-3 bg-gray-50 rounded-lg"><span class="font-bold text-gray-800">${item.id}</span><span class="text-sm text-gray-500">${time}</span></li>`;
+                        fastestList.innerHTML += createRankItemHTML(item);
                     });
                 } else {
                     fastestList.innerHTML = '<p class="text-gray-500">ยังไม่มีข้อมูล</p>';
                 }
 
-                // Changed data.slowestThree to data.slowestFive
+                // Populate slowest list
                 if (data.slowestFive && data.slowestFive.length > 0) {
                     data.slowestFive.forEach(item => {
-                        const time = new Date(item.time).toLocaleTimeString('th-TH', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
-                        slowestList.innerHTML += `<li class="flex items-center justify-between p-3 bg-gray-50 rounded-lg"><span class="font-bold text-gray-800">${item.id}</span><span class="text-sm text-gray-500">${time}</span></li>`;
+                        slowestList.innerHTML += createRankItemHTML(item);
                     });
                 } else {
                     slowestList.innerHTML = '<p class="text-gray-500">ยังไม่มีข้อมูล</p>';

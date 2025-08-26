@@ -31,7 +31,6 @@
         </div>
 
         <div id="dashboardContent" class="hidden">
-            <!-- Main Summary Grid -->
             <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
                 <div class="lg:col-span-1 bg-white p-6 rounded-xl shadow-lg">
                     <h2 class="text-2xl font-bold text-gray-700 mb-4">ภาพรวม</h2>
@@ -50,10 +49,13 @@
                     <div class="overflow-y-auto h-96 border rounded-lg">
                         <table class="min-w-full divide-y divide-gray-200">
                             <thead class="bg-gray-50">
+                                <!-- === TABLE HEADER EDITED HERE === -->
                                 <tr>
                                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">#</th>
                                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">รหัสพนักงาน</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ชื่อแผนก</th>
                                 </tr>
+                                <!-- === END OF EDIT === -->
                             </thead>
                             <tbody id="notCheckedInTableBody" class="bg-white divide-y divide-gray-200"></tbody>
                         </table>
@@ -61,20 +63,16 @@
                 </div>
             </div>
 
-            <!-- === NEW SECTION FOR RANKINGS HERE === -->
             <div class="mt-8 grid grid-cols-1 md:grid-cols-2 gap-8">
-                <!-- Fastest Check-ins Card -->
                 <div class="bg-white p-6 rounded-xl shadow-lg">
                     <h2 class="text-2xl font-bold text-gray-700 mb-4">3 อันดับ Check-in เร็วที่สุด</h2>
                     <ol id="fastestCheckinList" class="space-y-4"></ol>
                 </div>
-                <!-- Slowest Check-ins Card -->
                 <div class="bg-white p-6 rounded-xl shadow-lg">
                     <h2 class="text-2xl font-bold text-gray-700 mb-4">3 อันดับ Check-in ช้าที่สุด</h2>
                     <ol id="slowestCheckinList" class="space-y-4"></ol>
                 </div>
             </div>
-            <!-- === END OF NEW SECTION === -->
         </div>
     </div>
 
@@ -102,79 +100,51 @@
                 document.getElementById('notCheckedInCount').textContent = data.notCheckedIn.length;
                 document.getElementById('lastUpdated').textContent = new Date().toLocaleString('th-TH');
 
-                // ... (โค้ดส่วน Pie Chart และ ตาราง Not Checked-in เหมือนเดิม) ...
+                // ... (Pie Chart code is the same) ...
                 const ctx = document.getElementById('checkinPieChart').getContext('2d');
-                new Chart(ctx, {
-                    type: 'pie',
-                    data: {
-                        labels: ['Check-in แล้ว', 'ยังไม่ Check-in'],
-                        datasets: [{
-                            data: [data.checkedIn, data.total - data.checkedIn],
-                            backgroundColor: ['rgba(75, 192, 192, 0.8)', 'rgba(255, 99, 132, 0.8)'],
-                            borderColor: ['rgba(75, 192, 192, 1)', 'rgba(255, 99, 132, 1)'],
-                            borderWidth: 1
-                        }]
-                    },
-                    options: {
-                        responsive: true,
-                        plugins: {
-                            legend: { position: 'top' },
-                            tooltip: {
-                                callbacks: {
-                                    label: function(context) {
-                                        return `${context.label}: ${context.parsed} คน`;
-                                    }
-                                }
-                            }
-                        }
-                    }
-                });
+                new Chart(ctx, { type: 'pie', data: { labels: ['Check-in แล้ว', 'ยังไม่ Check-in'], datasets: [{ data: [data.checkedIn, data.total - data.checkedIn], backgroundColor: ['rgba(75, 192, 192, 0.8)', 'rgba(255, 99, 132, 0.8)'], borderColor: ['rgba(75, 192, 192, 1)', 'rgba(255, 99, 132, 1)'], borderWidth: 1 }] }, options: { responsive: true, plugins: { legend: { position: 'top' }, tooltip: { callbacks: { label: function(context) { return `${context.label}: ${context.parsed} คน`; } } } } } });
+
+                // --- SCRIPT EDITED HERE ---
+                // Populate Not Checked-in Table with department
                 const tableBody = document.getElementById('notCheckedInTableBody');
                 tableBody.innerHTML = '';
                 if (data.notCheckedIn.length > 0) {
-                    data.notCheckedIn.forEach((empId, index) => {
-                        tableBody.innerHTML += `<tr><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${index + 1}</td><td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">${empId}</td></tr>`;
+                    data.notCheckedIn.forEach((employee, index) => {
+                        const row = `<tr>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${index + 1}</td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">${employee.id}</td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${employee.department}</td>
+                                     </tr>`;
+                        tableBody.innerHTML += row;
                     });
                 } else {
-                    tableBody.innerHTML = `<tr><td colspan="2" class="px-6 py-4 text-center text-gray-500">ทุกคน Check-in เรียบร้อยแล้ว!</td></tr>`;
+                    // Update colspan to 3
+                    const row = `<tr><td colspan="3" class="px-6 py-4 text-center text-gray-500">ทุกคน Check-in เรียบร้อยแล้ว!</td></tr>`;
+                    tableBody.innerHTML = row;
                 }
+                // --- END OF EDIT ---
 
-
-                // --- SCRIPT EDITED HERE ---
-                // Populate Fastest and Slowest lists
+                // ... (Ranking lists code is the same) ...
                 const fastestList = document.getElementById('fastestCheckinList');
                 const slowestList = document.getElementById('slowestCheckinList');
                 fastestList.innerHTML = '';
                 slowestList.innerHTML = '';
-
-                // แสดงผล 3 อันดับเร็วที่สุด
                 if (data.fastestThree && data.fastestThree.length > 0) {
                     data.fastestThree.forEach(item => {
                         const time = new Date(item.time).toLocaleTimeString('th-TH', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
-                        const li = `<li class="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
-                                        <span class="font-bold text-gray-800">${item.id}</span>
-                                        <span class="text-sm text-gray-500">${time}</span>
-                                    </li>`;
-                        fastestList.innerHTML += li;
+                        fastestList.innerHTML += `<li class="flex items-center justify-between p-3 bg-gray-50 rounded-lg"><span class="font-bold text-gray-800">${item.id}</span><span class="text-sm text-gray-500">${time}</span></li>`;
                     });
                 } else {
                     fastestList.innerHTML = '<p class="text-gray-500">ยังไม่มีข้อมูล</p>';
                 }
-
-                // แสดงผล 3 อันดับช้าที่สุด
                 if (data.slowestThree && data.slowestThree.length > 0) {
                     data.slowestThree.forEach(item => {
                         const time = new Date(item.time).toLocaleTimeString('th-TH', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
-                        const li = `<li class="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
-                                        <span class="font-bold text-gray-800">${item.id}</span>
-                                        <span class="text-sm text-gray-500">${time}</span>
-                                    </li>`;
-                        slowestList.innerHTML += li;
+                        slowestList.innerHTML += `<li class="flex items-center justify-between p-3 bg-gray-50 rounded-lg"><span class="font-bold text-gray-800">${item.id}</span><span class="text-sm text-gray-500">${time}</span></li>`;
                     });
                 } else {
                     slowestList.innerHTML = '<p class="text-gray-500">ยังไม่มีข้อมูล</p>';
                 }
-                // --- END OF EDIT ---
 
             } else {
                 showError(data.message);

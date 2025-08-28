@@ -25,11 +25,6 @@
             <p class="text-gray-500 mt-2">กรุณากรอกรหัสพนักงานเพื่อรับเบอร์ห้อง</p>
         </div>
 
-        <div id="locationPrompt" class="hidden p-4 bg-blue-100 text-blue-800 rounded-lg text-center">
-            <p class="font-semibold">รบกวนพี่ๆน้องๆอนุญาตให้เว็บไซต์นี้<br>เข้าถึงตำแหน่งของคุณหน่อยนะครับ</p>
-            <p class="text-sm mt-1">(เพื่อยืนยันการเข้าร่วมงาน ณ สถานที่จัดงาน)</p>
-        </div>
-
         <form id="checkinForm" class="space-y-4">
             <div>
                 <label for="employeeId" class="block text-sm font-medium text-gray-700">รหัสพนักงาน</label>
@@ -56,42 +51,19 @@
         const loader = document.getElementById('loader');
         const resultDiv = document.getElementById('result');
         const employeeIdInput = document.getElementById('employeeId');
-        const locationPrompt = document.getElementById('locationPrompt');
         let currentEmployeeId = '';
 
         form.addEventListener('submit', (e) => {
             e.preventDefault();
-            setLoadingState(true, 'กำลังระบุตำแหน่ง...');
-            
-            currentEmployeeId = employeeIdInput.value;
-            locationPrompt.classList.remove('hidden');
 
-            if ('geolocation' in navigator) {
-                navigator.geolocation.getCurrentPosition(
-                    (position) => {
-                        const lat = position.coords.latitude;
-                        const lon = position.coords.longitude;
-                        sendDataToGoogle(lat, lon);
-                    },
-                    (error) => {
-                        console.warn(`Geolocation Error (${error.code}): ${error.message}`);
-                        sendDataToGoogle('', '');
-                    },
-                    {
-                        enableHighAccuracy: true,
-                        timeout: 15000,
-                        maximumAge: 0
-                    }
-                );
-            } else {
-                console.error('Geolocation is not supported by this browser.');
-                sendDataToGoogle('', '');
-            }
-        });
+            submitButton.disabled = true;
+            buttonText.textContent = 'กำลังตรวจสอบ...';
+            loader.classList.remove('hidden');
+            resultDiv.classList.add('hidden');
 
-        function sendDataToGoogle(latitude, longitude) {
-            setLoadingState(true, 'กำลังตรวจสอบ...');
-            
+            const employeeIdValue = employeeIdInput.value;
+            currentEmployeeId = employeeIdValue;
+
             const oldScript = document.getElementById('jsonp-script');
             if (oldScript) {
                 oldScript.remove();
@@ -99,21 +71,18 @@
 
             const script = document.createElement('script');
             script.id = 'jsonp-script';
-            script.src = `${SCRIPT_URL}?callback=handleGASResponse&employeeId=${encodeURIComponent(currentEmployeeId)}&latitude=${latitude}&longitude=${longitude}`;
-            
+            script.src = `${SCRIPT_URL}?callback=handleGASResponse&employeeId=${encodeURIComponent(employeeIdValue)}`;
+
             script.onerror = () => {
                 handleGASResponse({ status: 'error', message: 'ไม่สามารถเชื่อมต่อกับเซิร์ฟเวอร์ได้' });
             };
 
             document.body.appendChild(script);
-        }
+        });
 
         function handleGASResponse(data) {
-            // --- CODE EDITED HERE ---
-            // ทำให้ resultDiv แสดงผลก่อน แล้วค่อย reset ปุ่ม
             resultDiv.classList.remove('hidden', 'bg-green-100', 'text-green-800', 'bg-red-100', 'text-red-800', 'bg-yellow-100', 'text-yellow-800', 'bg-blue-100', 'text-blue-800');
-            locationPrompt.classList.add('hidden');
-
+            
             if (data.status === 'success') {
                 resultDiv.classList.add('bg-green-100', 'text-green-800');
                 resultDiv.innerHTML = `ยินดีต้อนรับ!<br>รหัสพนักงาน: <span class="font-bold">${currentEmployeeId}</span><br>กลุ่ม: <span class="font-bold">${data.group}</span><br>เบอร์ห้องของคุณคือ: <span class="font-bold text-2xl">${data.room}</span>`;
@@ -128,26 +97,16 @@
                 resultDiv.textContent = data.message || 'เกิดข้อผิดพลาดที่ไม่ทราบสาเหตุ';
             }
 
-            setLoadingState(false);
+            submitButton.disabled = false;
+            buttonText.textContent = 'Check-in';
+            loader.classList.add('hidden');
             employeeIdInput.value = '';
+
             const scriptTag = document.getElementById('jsonp-script');
             if (scriptTag) {
                 scriptTag.remove();
             }
         }
-
-        function setLoadingState(isLoading, message = 'Check-in') {
-            submitButton.disabled = isLoading;
-            buttonText.textContent = message;
-            if (isLoading) {
-                loader.classList.remove('hidden');
-                resultDiv.classList.add('hidden'); // ซ่อนผลลัพธ์เฉพาะตอนเริ่มโหลด
-            } else {
-                loader.classList.add('hidden');
-                // ไม่ต้องซ่อนผลลัพธ์ตอนโหลดเสร็จ
-            }
-        }
-        // --- END OF EDIT ---
     </script>
 </body>
 </html>

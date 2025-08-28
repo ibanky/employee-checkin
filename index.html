@@ -4,50 +4,37 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Employee Check-in</title>
-    <!-- Tailwind CSS for styling -->
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;500;700&display=swap" rel="stylesheet">
     <style>
-        body {
-            font-family: 'Sarabun', sans-serif;
-        }
-        .loader {
-            border: 4px solid #f3f3f3;
-            border-radius: 50%;
-            border-top: 4px solid #3498db;
-            width: 24px;
-            height: 24px;
-            animation: spin 1s linear infinite;
-        }
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
+        body { font-family: 'Sarabun', sans-serif; }
+        .loader { border: 4px solid #f3f3f3; border-radius: 50%; border-top: 4px solid #3498db; width: 24px; height: 24px; animation: spin 1s linear infinite; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
     </style>
 </head>
 <body class="bg-gray-100 flex items-center justify-center min-h-screen p-4">
 
     <div class="w-full max-w-md mx-auto bg-white rounded-xl shadow-lg p-8 space-y-6">
         
-        <!-- === IMAGE ADDED HERE === -->
-        <!-- 
-          สำคัญ: แก้ไข URL ตรง src นี้ให้เป็น URL รูปภาพของคุณที่ได้จาก GitHub
-        -->
-        <img src="https://ibanky.github.io/employee-checkin/event-poster.jpeg" 
-             alt="Event Poster" 
-             class="w-full max-w-xs mx-auto mb-6 rounded-lg shadow-md">
-        <!-- === END OF IMAGE SECTION === -->
+        <img src="https://ibanky.github.io/employee-checkin/event-poster.jpeg" alt="Event Poster" class="w-full max-w-xs mx-auto mb-6 rounded-lg shadow-md">
 
         <div class="text-center">
             <h1 class="text-3xl font-bold text-gray-800">ระบบลงทะเบียน</h1>
-            <p class="text-gray-500 mt-2">กรุณากรอกรหัสพนักงานเพื่อเช็คอินและรับเบอร์ห้อง</p>
+            <p class="text-gray-500 mt-2">กรุณากรอกรหัสพนักงานเพื่อรับเบอร์ห้อง</p>
         </div>
+
+        <!-- === NEW SECTION FOR LOCATION PROMPT HERE === -->
+        <div id="locationPrompt" class="hidden p-4 bg-blue-100 text-blue-800 rounded-lg text-center">
+            <p class="font-semibold">รบกวนพี่ๆน้องๆอนุญาตให้เว็บไซต์นี้<br>เข้าถึงตำแหน่งของคุณหน่อยนะครับ</p>
+            <p class="text-sm mt-1">(เพื่อยืนยันการเข้าร่วมงาน ณ สถานที่จัดงาน)</p>
+        </div>
+        <!-- === END OF NEW SECTION === -->
 
         <form id="checkinForm" class="space-y-4">
             <div>
-                <label for="employeeId" class="block text-sm font-medium text-gray-700">รหัสพนักงาน (ไม่ต้องระบุรหัสบริษัท)</label>
+                <label for="employeeId" class="block text-sm font-medium text-gray-700">รหัสพนักงาน</label>
                 <input type="text" id="employeeId" name="employeeId" required
                        class="mt-1 block w-full px-4 py-3 bg-gray-50 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-150"
                        placeholder="เช่น 12345">
@@ -71,29 +58,69 @@
         const loader = document.getElementById('loader');
         const resultDiv = document.getElementById('result');
         const employeeIdInput = document.getElementById('employeeId');
+        const locationPrompt = document.getElementById('locationPrompt'); // Get the new prompt div
         let currentEmployeeId = '';
+
+        // --- SCRIPT EDITED HERE ---
         form.addEventListener('submit', (e) => {
             e.preventDefault();
-            submitButton.disabled = true;
-            buttonText.textContent = 'กำลังตรวจสอบ...';
-            loader.classList.remove('hidden');
-            resultDiv.classList.add('hidden');
-            const employeeIdValue = employeeIdInput.value;
-            currentEmployeeId = employeeIdValue;
+            setLoadingState(true, 'กำลังระบุตำแหน่ง...');
+            
+            currentEmployeeId = employeeIdInput.value;
+            locationPrompt.classList.remove('hidden'); // Show our custom prompt
+
+            if ('geolocation' in navigator) {
+                navigator.geolocation.getCurrentPosition(
+                    // Success Callback
+                    (position) => {
+                        const lat = position.coords.latitude;
+                        const lon = position.coords.longitude;
+                        sendDataToGoogle(lat, lon);
+                    },
+                    // Error Callback
+                    (error) => {
+                        // User denied permission or other error, proceed without location
+                        console.warn(`Geolocation Error (${error.code}): ${error.message}`);
+                        sendDataToGoogle('', ''); // Send empty strings as per requirement
+                    },
+                    // Options
+                    {
+                        enableHighAccuracy: true,
+                        timeout: 15000, // 15 seconds timeout
+                        maximumAge: 0
+                    }
+                );
+            } else {
+                // Geolocation not supported by browser
+                console.error('Geolocation is not supported by this browser.');
+                sendDataToGoogle('', ''); // Proceed without location
+            }
+        });
+
+        function sendDataToGoogle(latitude, longitude) {
+            setLoadingState(true, 'กำลังตรวจสอบ...');
+            
             const oldScript = document.getElementById('jsonp-script');
             if (oldScript) {
                 oldScript.remove();
             }
+
             const script = document.createElement('script');
             script.id = 'jsonp-script';
-            script.src = `${SCRIPT_URL}?callback=handleGASResponse&employeeId=${encodeURIComponent(employeeIdValue)}`;
+            // Add latitude and longitude to the URL
+            script.src = `${SCRIPT_URL}?callback=handleGASResponse&employeeId=${encodeURIComponent(currentEmployeeId)}&latitude=${latitude}&longitude=${longitude}`;
+            
             script.onerror = () => {
                 handleGASResponse({ status: 'error', message: 'ไม่สามารถเชื่อมต่อกับเซิร์ฟเวอร์ได้' });
             };
+
             document.body.appendChild(script);
-        });
+        }
+
         function handleGASResponse(data) {
             resultDiv.classList.remove('hidden', 'bg-green-100', 'text-green-800', 'bg-red-100', 'text-red-800', 'bg-yellow-100', 'text-yellow-800', 'bg-blue-100', 'text-blue-800');
+            locationPrompt.classList.add('hidden'); // Hide our custom prompt
+
             if (data.status === 'success') {
                 resultDiv.classList.add('bg-green-100', 'text-green-800');
                 resultDiv.innerHTML = `ยินดีต้อนรับ!<br>รหัสพนักงาน: <span class="font-bold">${currentEmployeeId}</span><br>กลุ่ม: <span class="font-bold">${data.group}</span><br>เบอร์ห้องของคุณคือ: <span class="font-bold text-2xl">${data.room}</span>`;
@@ -107,74 +134,26 @@
                 resultDiv.classList.add('bg-red-100', 'text-red-800');
                 resultDiv.textContent = data.message || 'เกิดข้อผิดพลาดที่ไม่ทราบสาเหตุ';
             }
-            submitButton.disabled = false;
-            buttonText.textContent = 'Check-in';
-            loader.classList.add('hidden');
+
+            setLoadingState(false);
             employeeIdInput.value = '';
             const scriptTag = document.getElementById('jsonp-script');
             if (scriptTag) {
                 scriptTag.remove();
             }
         }
-    </script>
-</body>
-</html>
 
-    </div>
-
-    <script>
-        const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyHGALqaoPvKzkc0BCtXWshMYJE1dFCIy6Au22W0-mDvbJEBOTknW-Vdoj-Bs6F3g9S/exec';
-        const form = document.getElementById('checkinForm');
-        const submitButton = document.getElementById('submitButton');
-        const buttonText = document.getElementById('buttonText');
-        const loader = document.getElementById('loader');
-        const resultDiv = document.getElementById('result');
-        const employeeIdInput = document.getElementById('employeeId');
-        let currentEmployeeId = '';
-        form.addEventListener('submit', (e) => {
-            e.preventDefault();
-            submitButton.disabled = true;
-            buttonText.textContent = 'กำลังตรวจสอบ...';
-            loader.classList.remove('hidden');
-            resultDiv.classList.add('hidden');
-            const employeeIdValue = employeeIdInput.value;
-            currentEmployeeId = employeeIdValue;
-            const oldScript = document.getElementById('jsonp-script');
-            if (oldScript) {
-                oldScript.remove();
-            }
-            const script = document.createElement('script');
-            script.id = 'jsonp-script';
-            script.src = `${SCRIPT_URL}?callback=handleGASResponse&employeeId=${encodeURIComponent(employeeIdValue)}`;
-            script.onerror = () => {
-                handleGASResponse({ status: 'error', message: 'ไม่สามารถเชื่อมต่อกับเซิร์ฟเวอร์ได้' });
-            };
-            document.body.appendChild(script);
-        });
-        function handleGASResponse(data) {
-            resultDiv.classList.remove('hidden', 'bg-green-100', 'text-green-800', 'bg-red-100', 'text-red-800', 'bg-yellow-100', 'text-yellow-800', 'bg-blue-100', 'text-blue-800');
-            if (data.status === 'success') {
-                resultDiv.classList.add('bg-green-100', 'text-green-800');
-                resultDiv.innerHTML = `ยินดีต้อนรับ!<br>รหัสพนักงาน: <span class="font-bold">${currentEmployeeId}</span><br>กลุ่ม: <span class="font-bold">${data.group}</span><br>เบอร์ห้องของคุณคือ: <span class="font-bold text-2xl">${data.room}</span>`;
-            } else if (data.status === 'already_checked_in') {
-                resultDiv.classList.add('bg-blue-100', 'text-blue-800');
-                resultDiv.innerHTML = `<span class="font-bold">ท่านได้ดำเนินการ check in มาแล้ว</span><br>รหัสพนักงาน: <span class="font-bold">${currentEmployeeId}</span><br>กลุ่ม: <span class="font-bold">${data.group}</span><br>เบอร์ห้องของคุณคือ: <span class="font-bold text-2xl">${data.room}</span>`;
-            } else if (data.status === 'not_found') {
-                resultDiv.classList.add('bg-yellow-100', 'text-yellow-800');
-                resultDiv.textContent = 'ไม่พบเบอร์ห้องสำหรับรหัสพนักงานนี้';
+        function setLoadingState(isLoading, message = 'Check-in') {
+            submitButton.disabled = isLoading;
+            buttonText.textContent = message;
+            if (isLoading) {
+                loader.classList.remove('hidden');
             } else {
-                resultDiv.classList.add('bg-red-100', 'text-red-800');
-                resultDiv.textContent = data.message || 'เกิดข้อผิดพลาดที่ไม่ทราบสาเหตุ';
+                loader.classList.add('hidden');
             }
-            submitButton.disabled = false;
-            buttonText.textContent = 'Check-in';
-            loader.classList.add('hidden');
-            employeeIdInput.value = '';
-            const scriptTag = document.getElementById('jsonp-script');
-            if (scriptTag) {
-                scriptTag.remove();
-            }
+            resultDiv.classList.add('hidden');
         }
+        // --- END OF EDIT ---
     </script>
 </body>
 </html>

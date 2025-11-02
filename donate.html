@@ -12,7 +12,6 @@
         body { font-family: 'Sarabun', sans-serif; }
         .loader { border: 4px solid #f3f3f3; border-radius: 50%; border-top: 4px solid #3498db; width: 24px; height: 24px; animation: spin 1s linear infinite; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-        /* สไตล์สำหรับข้อมูลที่แสดงผล */
         .data-pair { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #eee; }
         .data-label { font-weight: 600; color: #555; }
         .data-value { color: #111; text-align: right; }
@@ -25,7 +24,6 @@
         <img src="https://ibanky.github.io/employee-checkin/event-poster.jpeg" alt="Event Poster" class="w-full max-w-xs mx-auto mb-6 rounded-lg shadow-md">
 
         <div class="text-center">
-            <!-- ข้อความใหม่ตามที่ขอ -->
             <h1 class="text-3xl font-bold text-gray-800">ระบบ ระบุยอด Donation</h1>
             <p class="text-gray-500 mt-2">กรุณากรอกรหัสพนักงานเพื่อตรวจสอบยอดบริจาค และระบุหมายเลขประจำตัวผู้เสียภาษี</p>
         </div>
@@ -35,7 +33,7 @@
             <div>
                 <label for="employeeId" class="block text-sm font-medium text-gray-700">รหัสพนักงาน</label>
                 <input type="text" id="employeeId" name="employeeId" required
-                       class="mt-1 block w-full px-4 py-3 bg-gray-50 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                       class="mt-1 block w-full px-4 py-3 bg-gray-50 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
                        placeholder="เช่น 12345">
             </div>
             <button type="submit" id="lookupButton"
@@ -47,7 +45,6 @@
 
         <!-- ฟอร์มสำหรับอัปเดต (ซ่อนไว้ตอนเริ่มต้น) -->
         <form id="updateForm" class="space-y-4 hidden">
-            <!-- ข้อมูลที่ดึงมาแสดง (อ่านอย่างเดียว) -->
             <div class="space-y-2 p-4 bg-gray-50 rounded-lg">
                 <div>
                     <span class="text-sm font-medium text-gray-500">รหัสพนักงาน:</span>
@@ -63,10 +60,9 @@
                 </div>
             </div>
 
-            <!-- ช่องสำหรับกรอกข้อมูลใหม่ -->
-            <p class="text-sm font-medium text-gray-700">กรุณากรอกข้อมูลเพื่อใช้ e-donation</p>
+            <p class="text-sm font-medium text-gray-700">กรุณากรอกข้อมูลเพื่อใช้ในการออก e-donation</p>
             <div>
-                <label for="nameThai" class="block text-sm font-medium text-gray-700">ชื่อ-นามสกุลผู้เสียภาษี (ภาษาไทย)</label>
+                <label for="nameThai" class="block text-sm font-medium text-gray-700">ชื่อ-นามสกุล ผู้เสียภาษี (ภาษาไทย)</label>
                 <input type="text" id="nameThai" required
                        class="mt-1 block w-full px-4 py-3 bg-gray-50 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
             </div>
@@ -91,7 +87,6 @@
     </div>
 
     <script>
-        // !!! URL นี้ต้องเป็น URL ล่าสุดที่คุณได้จากการ Deploy นะครับ !!!
         const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyHGALqaoPvKzkc0BCtXWshMYJE1dFCIy6Au22W0-mDvbJEBOTknW-Vdoj-Bs6F3g9S/exec';
 
         const lookupForm = document.getElementById('lookupForm');
@@ -99,30 +94,26 @@
         const resultDiv = document.getElementById('resultDiv');
         const employeeIdInput = document.getElementById('employeeId');
 
-        // ปุ่มและ Loader ของฟอร์มค้นหา
         const lookupButton = document.getElementById('lookupButton');
         const lookupButtonText = document.getElementById('lookupButtonText');
         const lookupLoader = document.getElementById('lookupLoader');
 
-        // ปุ่มและ Loader ของฟอร์มบันทึก
         const updateButton = document.getElementById('updateButton');
         const updateButtonText = document.getElementById('updateButtonText');
         const updateLoader = document.getElementById('updateLoader');
 
-        // 1. เมื่อกดปุ่ม "ตรวจสอบข้อมูล"
         lookupForm.addEventListener('submit', (e) => {
             e.preventDefault();
             lookupButton.disabled = true;
             lookupButtonText.textContent = 'กำลังค้นหา...';
             lookupLoader.classList.remove('hidden');
             resultDiv.classList.add('hidden');
+            updateForm.classList.add('hidden'); // ซ่อนฟอร์มเผื่อไว้ก่อน
 
             const employeeId = employeeIdInput.value;
-            // ส่ง action=donate_lookup เพื่อเรียกฟังก์ชันที่ถูกต้อง
             sendRequest(`donate_lookup&employeeId=${encodeURIComponent(employeeId)}`);
         });
 
-        // 2. เมื่อกดปุ่ม "บันทึกข้อมูล"
         updateForm.addEventListener('submit', (e) => {
             e.preventDefault();
             updateButton.disabled = true;
@@ -133,12 +124,10 @@
             const nameThai = document.getElementById('nameThai').value;
             const taxId = document.getElementById('taxId').value;
             
-            // ส่ง action=donate_update เพื่อเรียกฟังก์ชันที่ถูกต้อง
             const params = `donate_update&rowIndex=${rowIndex}&nameThai=${encodeURIComponent(nameThai)}&taxId=${encodeURIComponent(taxId)}`;
             sendRequest(params);
         });
         
-        // ฟังก์ชันกลางสำหรับส่ง JSONP Request
         function sendRequest(params) {
             const oldScript = document.getElementById('jsonp-script');
             if (oldScript) { oldScript.remove(); }
@@ -153,41 +142,41 @@
             document.body.appendChild(script);
         }
 
-        // 3. ฟังก์ชันหลักในการจัดการผลลัพธ์
         function handleGASResponse(data) {
             resetLoaders();
-            resultDiv.classList.remove('hidden', 'bg-green-100', 'text-green-800', 'bg-red-100', 'text-red-800', 'bg-yellow-100', 'text-yellow-800');
+            resultDiv.classList.remove('hidden', 'bg-green-100', 'text-green-800', 'bg-red-100', 'text-red-800', 'bg-yellow-100', 'text-yellow-800', 'bg-blue-100', 'text-blue-800');
 
             if (data.status === 'not_found') {
-                // Req 6: ไม่พบข้อมูล
                 resultDiv.textContent = data.message;
                 resultDiv.classList.add('bg-yellow-100', 'text-yellow-800');
                 resultDiv.classList.remove('hidden');
-                lookupForm.classList.remove('hidden'); // กลับไปหน้าค้นหา
+                lookupForm.classList.remove('hidden'); 
                 updateForm.classList.add('hidden');
             } 
             else if (data.status === 'incomplete') {
-                // Req 3: พบข้อมูล แต่ยังไม่ครบ
-                lookupForm.classList.add('hidden'); // ซ่อนฟอร์มค้นหา
-                updateForm.classList.remove('hidden'); // แสดงฟอร์มกรอกข้อมูล
+                lookupForm.classList.add('hidden');
+                updateForm.classList.remove('hidden');
+                resultDiv.classList.add('hidden'); // ซ่อน result เผื่อไว้
                 
-                // เติมข้อมูลที่ได้มาลงในฟอร์ม
                 document.getElementById('displayEmployeeId').textContent = data.data.id;
                 document.getElementById('displayNameInitial').textContent = data.data.name_initial;
                 document.getElementById('displayAmount').textContent = data.data.amount;
                 document.getElementById('rowIndex').value = data.data.rowIndex;
+                
+                // --- FIX ADDED HERE ---
+                // เติมค่าที่อาจจะมี หรือล้างค่าเก่าทิ้งถ้าไม่มี
+                document.getElementById('nameThai').value = data.data.name_thai || '';
+                document.getElementById('taxId').value = data.data.tax_id || '';
+                // --- END OF FIX ---
             }
             else if (data.status === 'complete' || data.status === 'update_success') {
-                // Req 5 & 7: ข้อมูลครบถ้วน (ไม่ว่าจะเพิ่งกรอก หรือมีอยู่แล้ว)
-                lookupForm.classList.add('hidden'); // ซ่อนฟอร์มค้นหา
-                updateForm.classList.add('hidden'); // ซ่อนฟอร์มกรอก
+                lookupForm.classList.add('hidden');
+                updateForm.classList.add('hidden');
                 
-                // แสดงผลลัพธ์ 5 รายการ
                 showFullRecord(data.data, (data.status === 'update_success'));
                 resultDiv.classList.remove('hidden');
             }
             else {
-                // กรณี Error อื่นๆ
                 resultDiv.textContent = data.message || 'เกิดข้อผิดพลาดที่ไม่ทราบสาเหตุ';
                 resultDiv.classList.add('bg-red-100', 'text-red-800');
                 resultDiv.classList.remove('hidden');
@@ -199,7 +188,6 @@
             if (scriptTag) { scriptTag.remove(); }
         }
         
-        // ฟังก์ชันสำหรับแสดงผลข้อมูล 5 รายการ
         function showFullRecord(record, isSuccessUpdate) {
             let title = isSuccessUpdate ? '<h3 class="text-xl font-bold text-green-700 mb-3">บันทึกข้อมูลสำเร็จ!</h3>' : '<h3 class="text-xl font-bold text-blue-700 mb-3">ตรวจสอบข้อมูลสำเร็จ</h3>';
             
@@ -219,25 +207,34 @@
                         <span class="data-value font-bold text-green-600">${record.amount}</span>
                     </div>
                     <div class="data-pair">
-                        <span class="data-label">ชื่อ-นามสกุลผู้เสียภาษี (ภาษาไทย):</span>
+                        <span class="data-label">ชื่อ-นามสกุล ผู้เสียภาษี (ภาษาไทย):</span>
                         <span class="data-value">${record.name_thai}</span>
                     </div>
                     <div class="data-pair">
-                        <span class="data-label">เลขประจำตัวผู้เสียภาษี:</span>
+                        <span class="data-label">เลขประจำตัวผู้เสียภาษี (เบอร์บัตรประชาชน):</span>
                         <span class="data-value">${record.tax_id}</span>
                     </div>
                 </div>
-                <button onclick="resetPage()" class="mt-6 w-full py-2 px-4 rounded-lg text-sm text-white bg-gray-500 hover:bg-gray-600">กลับไปหน้าแรก</D>
+                <button onclick="resetPage()" class="mt-6 w-full py-2 px-4 rounded-lg text-sm text-white bg-gray-500 hover:bg-gray-600">กลับไปหน้าแรก</button>
             `;
             resultDiv.classList.add(isSuccessUpdate ? 'bg-green-100' : 'bg-blue-100');
         }
 
-        // ฟังก์ชันสำหรับ Reset หน้าจอ
         function resetPage() {
             lookupForm.classList.remove('hidden');
             updateForm.classList.add('hidden');
             resultDiv.classList.add('hidden');
             employeeIdInput.value = '';
+
+            // --- FIX ADDED HERE ---
+            // ล้างข้อมูลในฟอร์ม update ทุกครั้งที่กด "กลับไปหน้าแรก"
+            document.getElementById('nameThai').value = '';
+            document.getElementById('taxId').value = '';
+            document.getElementById('rowIndex').value = '';
+            document.getElementById('displayEmployeeId').textContent = '';
+            document.getElementById('displayNameInitial').textContent = '';
+            document.getElementById('displayAmount').textContent = '';
+            // --- END OF FIX ---
         }
         
         function resetLoaders() {
@@ -253,3 +250,4 @@
     </script>
 </body>
 </html>
+

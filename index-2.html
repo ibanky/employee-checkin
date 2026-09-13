@@ -1,0 +1,522 @@
+<!doctype html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#087783">
+<meta name="description" content="ลงทะเบียน TISCO IT Seminar 2026 และรับหมายเลขห้อง">
+<title>TISCO IT Seminar 2026 | ลงทะเบียน</title>
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='9' fill='%23087783'/%3E%3Cpath d='M7 10h18v4h-7v12h-4V14H7z' fill='white'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+<style>
+  :root {
+    --primary: #087783;
+    --primary-hover: #065c65;
+    --bg-surface: #f4f7f6;
+    --card-bg: #ffffff;
+    --text-main: #1f2937;
+    --text-muted: #6b7280;
+    --error: #dc2626;
+    --success: #16a34a;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'Sarabun', -apple-system, BlinkMacSystemFont, sans-serif;
+    background-color: var(--bg-surface);
+    color: var(--text-main);
+    display: flex;
+    justify-content: center;
+    min-height: 100vh;
+  }
+
+  .event-app {
+    width: 100%;
+    max-width: 440px;
+    background: #fff;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.05);
+  }
+
+  /* Hero Section */
+  .hero {
+    position: relative;
+    width: 100%;
+    height: 240px;
+    overflow: hidden;
+    background: #087783;
+  }
+  .hero img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+  .hero-shade {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(180deg, rgba(0,0,0,0.1) 0%, rgba(8,119,131,0.85) 100%);
+  }
+  .edition {
+    position: absolute;
+    bottom: 16px;
+    left: 20px;
+    color: #fff;
+    font-size: 1.1rem;
+    font-weight: 700;
+    letter-spacing: 1px;
+  }
+  .edition span { color: #fde047; }
+
+  /* Content & Card */
+  .content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    padding: 24px 20px;
+  }
+  .checkin-card {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+  }
+  .card-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16px;
+  }
+  .eyebrow {
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: var(--primary);
+    letter-spacing: 1.5px;
+  }
+  .step {
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: var(--text-muted);
+  }
+
+  h1 {
+    font-size: 1.65rem;
+    line-height: 1.3;
+    font-weight: 700;
+    color: #111827;
+    margin-bottom: 8px;
+  }
+  h1 span { color: var(--primary); }
+  .intro {
+    font-size: 0.95rem;
+    color: var(--text-muted);
+    line-height: 1.5;
+    margin-bottom: 24px;
+  }
+
+  /* Form */
+  form label {
+    display: block;
+    font-size: 0.875rem;
+    font-weight: 600;
+    margin-bottom: 6px;
+  }
+  .input-wrap {
+    position: relative;
+    display: flex;
+    align-items: center;
+  }
+  .input-wrap svg {
+    position: absolute;
+    left: 14px;
+    width: 20px;
+    height: 20px;
+    stroke: #9ca3af;
+    stroke-width: 2;
+    fill: none;
+  }
+  .input-wrap input {
+    width: 100%;
+    padding: 12px 14px 12px 44px;
+    font-size: 1rem;
+    border: 1.5px solid #e5e7eb;
+    border-radius: 12px;
+    outline: none;
+    transition: border-color 0.2s;
+    font-family: inherit;
+  }
+  .input-wrap input:focus {
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px rgba(8,119,131,0.15);
+  }
+  .input-help {
+    font-size: 0.8rem;
+    color: var(--text-muted);
+    margin-top: 6px;
+  }
+  .error {
+    font-size: 0.85rem;
+    color: var(--error);
+    margin-top: 10px;
+    background: #fef2f2;
+    padding: 10px 14px;
+    border-radius: 8px;
+    border: 1px solid #fee2e2;
+  }
+
+  /* Buttons */
+  button {
+    font-family: inherit;
+    cursor: pointer;
+    border-radius: 12px;
+    font-weight: 600;
+    font-size: 1rem;
+    transition: all 0.2s;
+  }
+  button.primary {
+    width: 100%;
+    margin-top: 20px;
+    background: var(--primary);
+    color: #fff;
+    border: none;
+    padding: 14px 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+  }
+  button.primary svg {
+    width: 20px;
+    height: 20px;
+    stroke: currentColor;
+    stroke-width: 2.2;
+    fill: none;
+  }
+  button.primary:hover:not(:disabled) {
+    background: var(--primary-hover);
+  }
+  button.primary:disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
+  }
+
+  button.secondary {
+    width: 100%;
+    background: #f3f4f6;
+    color: #374151;
+    border: 1px solid #e5e7eb;
+    padding: 12px 20px;
+    margin-top: 20px;
+  }
+  button.secondary:hover {
+    background: #e5e7eb;
+  }
+
+  /* Ticket / Result */
+  #success {
+    text-align: center;
+    padding-top: 10px;
+  }
+  .success-icon {
+    width: 54px;
+    height: 54px;
+    border-radius: 50%;
+    background: #dcfce7;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 12px;
+  }
+  .success-icon svg {
+    width: 28px;
+    height: 28px;
+    stroke: var(--success);
+    stroke-width: 2.5;
+    fill: none;
+  }
+  .welcome {
+    font-size: 0.95rem;
+    color: var(--text-muted);
+    margin-top: 4px;
+    margin-bottom: 20px;
+  }
+
+  .room-ticket {
+    background: linear-gradient(135deg, #087783 0%, #054e56 100%);
+    color: #fff;
+    border-radius: 16px;
+    padding: 24px 20px;
+    text-align: center;
+    box-shadow: 0 10px 20px rgba(8,119,131,0.25);
+    margin-bottom: 16px;
+    position: relative;
+  }
+  .room-ticket > span {
+    font-size: 0.85rem;
+    letter-spacing: 0.5px;
+    opacity: 0.9;
+    display: block;
+    margin-bottom: 8px;
+  }
+  .room-ticket strong {
+    font-size: 2.6rem;
+    display: block;
+    line-height: 1.1;
+  }
+  .room-ticket strong small {
+    font-size: 1rem;
+    letter-spacing: 2px;
+    opacity: 0.8;
+    display: block;
+  }
+  .ticket-bottom {
+    margin-top: 18px;
+    padding-top: 14px;
+    border-top: 1px dashed rgba(255,255,255,0.3);
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.875rem;
+  }
+  .ticket-bottom span { opacity: 0.85; }
+  .enjoy {
+    font-size: 0.875rem;
+    color: var(--text-muted);
+  }
+
+  /* Card Footer & Page Footer */
+  .card-footer {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    font-size: 0.75rem;
+    color: #9ca3af;
+    margin-top: 30px;
+  }
+  .card-footer svg {
+    width: 14px;
+    height: 14px;
+    stroke: currentColor;
+    stroke-width: 2;
+    fill: none;
+  }
+  .page-footer {
+    text-align: center;
+    padding-top: 24px;
+    border-top: 1px solid #f3f4f6;
+    margin-top: 20px;
+    font-size: 0.75rem;
+    color: #9ca3af;
+  }
+  .page-footer p i { font-style: normal; margin: 0 4px; }
+  .demo-note {
+    margin-top: 6px;
+    font-size: 0.7rem;
+    color: #cbd5e1;
+  }
+
+  /* Spinner Loader */
+  .btn-spinner {
+    border: 2px solid rgba(255,255,255,0.3);
+    border-radius: 50%;
+    border-top: 2px solid #fff;
+    width: 18px;
+    height: 18px;
+    animation: spin 0.8s linear infinite;
+    display: inline-block;
+  }
+  @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+</style>
+</head>
+<body>
+<main class="event-app">
+  <header class="hero" aria-label="TISCO IT Seminar 2026">
+    <img src="https://ibanky.github.io/employee-checkin/hero-portrait.png" width="941" height="1672" alt="TISCO IT Seminar 2026 บรรยากาศงานริมทะเล ต้นปาล์มและหาดทราย" fetchpriority="high">
+    <div class="hero-shade"></div>
+    <span class="edition">IT SEMINAR <span>2026</span></span>
+  </header>
+  
+  <div class="content">
+    <section class="checkin-card" aria-label="ลงทะเบียนเข้าร่วมงาน">
+      <div class="card-top">
+        <span class="eyebrow">WELCOME TO THE BEACH</span>
+        <span class="step" id="step">01 / 02</span>
+      </div>
+
+      <!-- ส่วนที่ 1: หน้ากรอกรหัสพนักงาน -->
+      <div id="registration">
+        <h1>พร้อมพัก…<br><span>แล้วมาเช็กอินกัน</span></h1>
+        <p class="intro">กรอกรหัสพนักงานเพื่อลงทะเบียน<br>และรับหมายเลขห้องของคุณ</p>
+        
+        <form id="checkin-form" novalidate>
+          <label for="employee-id">รหัสพนักงาน</label>
+          <div class="input-wrap">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="3.5"/><path d="M5 21v-2a7 7 0 0 1 14 0v2"/></svg>
+            <input id="employee-id" name="employeeId" type="text" inputmode="numeric" autocomplete="off" maxlength="20" placeholder="เช่น 12345" aria-describedby="input-help error" required>
+          </div>
+          <p class="input-help" id="input-help">ใช้รหัสพนักงานของคุณในการลงทะเบียน</p>
+          <p id="error" class="error" role="alert" style="display: none;"></p>
+          
+          <button class="primary" type="submit" id="submit-btn">
+            <span id="btn-text">Check-in</span>
+            <div id="btn-loader" class="btn-spinner" style="display: none;"></div>
+            <svg id="btn-arrow" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14m-6-6 6 6-6 6"/></svg>
+          </button>
+        </form>
+      </div>
+
+      <!-- ส่วนที่ 2: หน้าแสดงผลเมื่อลงทะเบียนสำเร็จ -->
+      <section id="success" style="display: none;" aria-labelledby="success-title">
+        <div class="success-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="m5 12 4 4L19 6"/></svg></div>
+        <h1 id="success-title" tabindex="-1">Check-in สำเร็จ</h1>
+        <p class="welcome" id="welcome-msg">ยินดีต้อนรับ</p>
+        
+        <div class="room-ticket">
+          <span>ห้องของคุณคือ</span>
+          <strong><small>ROOM</small> <span id="room-number">-</span></strong>
+          <div class="ticket-bottom">
+            <span>รหัส: <b id="guest-id">-</b></span>
+            <span>กลุ่ม: <b id="guest-group">-</b></span>
+          </div>
+        </div>
+
+        <p class="enjoy">เก็บหน้านี้ไว้ แล้วไปสนุกด้วยกันครับ</p>
+        <button class="secondary" id="reset" type="button">กลับหน้าลงทะเบียน</button>
+      </section>
+
+      <div class="card-footer">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3 4 7v5c0 5 8 9 8 9s8-4 8-9V7z"/><path d="m8 12 3 3 5-6"/></svg>
+        <span>สำหรับพนักงานที่เข้าร่วมงาน</span>
+      </div>
+    </section>
+
+    <footer class="page-footer">
+      <p>Eat <i>•</i> Drink <i>•</i> Relax</p>
+      <span>TISCO IT SEMINAR 2026</span>
+    </footer>
+  </div>
+</main>
+
+<script>
+  const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyHGALqaoPvKzkc0BCtXWshMYJE1dFCIy6Au22W0-mDvbJEBOTknW-Vdoj-Bs6F3g9S/exec';
+  
+  // Element References
+  const form = document.getElementById('checkin-form');
+  const employeeIdInput = document.getElementById('employee-id');
+  const submitBtn = document.getElementById('submit-btn');
+  const btnText = document.getElementById('btn-text');
+  const btnLoader = document.getElementById('btn-loader');
+  const btnArrow = document.getElementById('btn-arrow');
+  const errorMsg = document.getElementById('error');
+
+  const registrationSection = document.getElementById('registration');
+  const successSection = document.getElementById('success');
+  const stepIndicator = document.getElementById('step');
+
+  const successTitle = document.getElementById('success-title');
+  const welcomeMsg = document.getElementById('welcome-msg');
+  const roomNumber = document.getElementById('room-number');
+  const guestId = document.getElementById('guest-id');
+  const guestGroup = document.getElementById('guest-group');
+  const resetBtn = document.getElementById('reset');
+
+  let currentEmployeeId = '';
+
+  // Form Submit Handler
+  form.addEventListener('submit', (e) => {
+    e.preventDefault();
+    const idVal = employeeIdInput.value.trim();
+
+    if (!idVal) {
+      showError('กรุณากรอกรหัสพนักงาน');
+      return;
+    }
+
+    setLoading(true);
+    currentEmployeeId = idVal;
+
+    // เคลียร์ JSONP เก่า (ถ้ามี)
+    const oldScript = document.getElementById('jsonp-script');
+    if (oldScript) oldScript.remove();
+
+    // สร้าง Script Tag สำหรับ JSONP Callback
+    const script = document.createElement('script');
+    script.id = 'jsonp-script';
+    script.src = `${SCRIPT_URL}?callback=handleGASResponse&employeeId=${encodeURIComponent(idVal)}`;
+    script.onerror = () => {
+      handleGASResponse({ status: 'error', message: 'ไม่สามารถเชื่อมต่อกับเซิร์ฟเวอร์ได้ กรุณาลองใหม่อีกครั้ง' });
+    };
+
+    document.body.appendChild(script);
+  });
+
+  // GAS Response Callback
+  window.handleGASResponse = function(data) {
+    setLoading(false);
+
+    // ลบแท็ก script ของ jsonp ออกหลังประมวลผลเสร็จ
+    const scriptTag = document.getElementById('jsonp-script');
+    if (scriptTag) scriptTag.remove();
+
+    if (data.status === 'success' || data.status === 'already_checked_in') {
+      showSuccess(data);
+    } else if (data.status === 'not_found') {
+      showError('ไม่พบข้อมูลหรือเบอร์ห้องสำหรับรหัสพนักงานนี้');
+    } else {
+      showError(data.message || 'เกิดข้อผิดพลาดที่ไม่ทราบสาเหตุ');
+    }
+  };
+
+  function setLoading(isLoading) {
+    submitBtn.disabled = isLoading;
+    if (isLoading) {
+      btnText.textContent = 'กำลังตรวจสอบ...';
+      btnLoader.style.display = 'inline-block';
+      btnArrow.style.display = 'none';
+      errorMsg.style.display = 'none';
+    } else {
+      btnText.textContent = 'Check-in';
+      btnLoader.style.display = 'none';
+      btnArrow.style.display = 'inline-block';
+    }
+  }
+
+  function showError(msg) {
+    errorMsg.textContent = msg;
+    errorMsg.style.display = 'block';
+  }
+
+  function showSuccess(data) {
+    registrationSection.style.display = 'none';
+    successSection.style.display = 'block';
+    stepIndicator.textContent = '02 / 02';
+
+    if (data.status === 'already_checked_in') {
+      successTitle.textContent = 'เช็กอินเรียบร้อยแล้ว';
+      welcomeMsg.textContent = 'คุณได้ดำเนินการเช็กอินไว้ก่อนหน้านี้แล้ว';
+    } else {
+      successTitle.textContent = 'Check-in สำเร็จ';
+      welcomeMsg.textContent = 'ยินดีต้อนรับสู่งานสัมมนา!';
+    }
+
+    roomNumber.textContent = data.room || '-';
+    guestId.textContent = currentEmployeeId;
+    guestGroup.textContent = data.group || '-';
+  }
+
+  // Reset Button กลับไปหน้าแรก
+  resetBtn.addEventListener('click', () => {
+    employeeIdInput.value = '';
+    errorMsg.style.display = 'none';
+    successSection.style.display = 'none';
+    registrationSection.style.display = 'block';
+    stepIndicator.textContent = '01 / 02';
+    employeeIdInput.focus();
+  });
+</script>
+</body>
+</html>
